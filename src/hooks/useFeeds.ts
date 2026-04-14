@@ -17,3 +17,22 @@ export function useAddFeed() {
     onSuccess: () => qc.invalidateQueries({ queryKey: FEEDS_KEY }),
   })
 }
+
+export function useRefreshFeed() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => feedsApi.refresh(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: FEEDS_KEY }),
+  })
+}
+
+export function useDeleteFeed() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => feedsApi.delete(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: FEEDS_KEY })
+      qc.invalidateQueries({ queryKey: ['articles'] })
+    },
+  })
+}
