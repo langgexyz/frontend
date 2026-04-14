@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Article } from '../api/articles'
+import type { Article } from '../api/articles'
 
 interface Props {
   article: Article

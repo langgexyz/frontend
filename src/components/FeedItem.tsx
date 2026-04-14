@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import { useRefreshFeed, useDeleteFeed } from '../hooks/useFeeds'
-import { Feed } from '../api/feeds'
+import type { Feed } from '../api/feeds'
 
 interface Props {
   feed: Feed

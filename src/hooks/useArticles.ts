@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArticleFilter, articlesApi } from '../api/articles'
+import type { ArticleFilter } from '../api/articles'
+import { articlesApi } from '../api/articles'
 
 export const ARTICLES_KEY = 'articles'
 
