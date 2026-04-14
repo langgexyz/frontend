@@ -42,4 +42,6 @@ export const articlesApi = {
   getById: (id: number) => client.get<Article>(`/articles/${id}`).then((r) => r.data),
   update: (id: number, updates: Partial<Pick<Article, 'is_read' | 'is_starred'>>) =>
     client.patch<Article>(`/articles/${id}`, updates).then((r) => r.data),
+  fetchFulltext: (id: number) =>
+    client.get<Article>(`/articles/${id}/fulltext`).then((r) => r.data),
 }
