@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import DOMPurify from 'dompurify'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useArticle, useUpdateArticle } from '../hooks/useArticles'
+import { articlesApi } from '../api/articles'
 
 export default function ArticleDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -9,6 +11,14 @@ export default function ArticleDetailPage() {
 
   const { data: article, isLoading, isError } = useArticle(articleId)
   const updateArticle = useUpdateArticle()
+
+  const qc = useQueryClient()
+  const fulltextMutation = useMutation({
+    mutationFn: () => articlesApi.fetchFulltext(articleId),
+    onSuccess: (data) => {
+      qc.setQueryData(['articles', articleId], data)
+    },
+  })
 
   if (isLoading) {
     return (
@@ -61,6 +71,15 @@ export default function ArticleDetailPage() {
             >
               原文 ↗
             </a>
+          )}
+          {!article.is_full_content && (
+            <button
+              onClick={() => fulltextMutation.mutate()}
+              disabled={fulltextMutation.isPending}
+              className="text-sm border border-blue-500 text-blue-500 px-2 py-0.5 rounded hover:bg-blue-50 disabled:opacity-50"
+            >
+              {fulltextMutation.isPending ? '抓取中…' : '抓取全文'}
+            </button>
           )}
         </div>
       </div>
