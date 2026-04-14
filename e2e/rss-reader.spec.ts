@@ -59,10 +59,8 @@ test.describe('RSS 阅读器 E2E', () => {
     await input.fill(FIXTURE_FEED_URL)
     await page.getByRole('button', { name: '+' }).click()
 
-    // 2. 等待订阅源出现在侧边栏（任意状态点可见）
-    await expect(
-      page.locator('span[title]').filter({ hasText: '' }).first()
-    ).toBeVisible({ timeout: 15_000 })
+    // 2. 等待订阅源出现在侧边栏（FeedItem 显示 URL 文字）
+    await expect(page.getByText('localhost:4000')).toBeVisible({ timeout: 15_000 })
 
     // 3. 等待文章出现（后端异步抓取，staleTime=30s 所以前端轮询靠手动刷新）
     //    文章列表在 TanStack Query staleTime 内不会自动刷新，
@@ -76,6 +74,8 @@ test.describe('RSS 阅读器 E2E', () => {
     // 4. 点击文章 → 进入详情页（自动标记已读）
     await page.getByText('E2E Test Article 1').click()
     await expect(page).toHaveURL(/\/articles\/\d+/)
+    // 等待文章详情加载完成（h1 出现说明 API 已返回，后端已标记已读）
+    await expect(page.locator('h1')).toContainText('E2E Test Article 1')
 
     // 5. 返回列表，文章应变为已读样式（border-l-blue-500 消失）
     await page.goBack()
