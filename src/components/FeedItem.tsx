@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useRefreshFeed, useDeleteFeed } from '../hooks/useFeeds'
 import type { Feed } from '../api/feeds'
 
@@ -20,8 +20,9 @@ const STATUS_DOT: Record<Feed['fetch_status'], string> = {
 }
 
 export default function FeedItem({ feed }: Props) {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const isActive = searchParams.get('feed_id') === String(feed.id)
+  const navigate = useNavigate()
+  const { pathname, search } = useLocation()
+  const isActive = pathname === '/articles' && new URLSearchParams(search).get('feed_id') === String(feed.id)
   const refreshFeed = useRefreshFeed()
   const deleteFeed = useDeleteFeed()
 
@@ -29,7 +30,7 @@ export default function FeedItem({ feed }: Props) {
   const updateTime = formatUpdateTime(feed.source_updated_at || feed.last_fetched_at)
 
   const handleSelect = () => {
-    setSearchParams({ feed_id: String(feed.id) })
+    navigate(`/articles?feed_id=${feed.id}`)
   }
 
   const handleRefresh = (e: React.MouseEvent) => {
@@ -42,7 +43,7 @@ export default function FeedItem({ feed }: Props) {
     if (window.confirm(`确认删除订阅源"${displayTitle}"？`)) {
       deleteFeed.mutate(feed.id, {
         onSuccess: () => {
-          if (isActive) setSearchParams({})
+          if (isActive) navigate('/articles')
         },
       })
     }

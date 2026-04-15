@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import AddFeedForm from './AddFeedForm'
 import FeedList from './FeedList'
 
@@ -26,12 +26,15 @@ function NavButton({
 }
 
 export default function Sidebar() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const feedId = searchParams.get('feed_id')
-  const starred = searchParams.get('starred')
+  const navigate = useNavigate()
+  const { pathname, search } = useLocation()
+  const params = new URLSearchParams(search)
+  const feedId = params.get('feed_id')
+  const starred = params.get('starred')
 
-  const isAllActive = !feedId && !starred
-  const isStarredActive = starred === '1' && !feedId
+  const isOnList = pathname === '/articles'
+  const isAllActive = isOnList && !feedId && !starred
+  const isStarredActive = isOnList && starred === '1' && !feedId
 
   return (
     <div className="flex flex-col h-full">
@@ -41,12 +44,12 @@ export default function Sidebar() {
           <NavButton
             label="全部文章"
             isActive={isAllActive}
-            onClick={() => setSearchParams({})}
+            onClick={() => navigate('/articles')}
           />
           <NavButton
             label="★ 收藏"
             isActive={isStarredActive}
-            onClick={() => setSearchParams({ starred: '1' })}
+            onClick={() => navigate('/articles?starred=1')}
           />
         </div>
         <div className="mt-3 px-3 mb-1">
