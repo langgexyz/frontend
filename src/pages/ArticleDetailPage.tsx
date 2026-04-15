@@ -40,7 +40,10 @@ export default function ArticleDetailPage() {
     updateArticle.mutate({ id: articleId, updates: { is_starred: !article.is_starred } })
   }
 
-  const safeHtml = DOMPurify.sanitize(article.content || '')
+  const safeHtml = DOMPurify.sanitize(article.content || '', {
+    FORBID_ATTR: ['style', 'class', 'id'],   // 禁止内联样式和 class，防止第三方 CSS 覆盖页面布局
+    FORBID_TAGS: ['style'],                   // 禁止 <style> 标签（DOMPurify 默认保留）
+  })
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-6">
@@ -98,15 +101,15 @@ export default function ArticleDetailPage() {
         )}
       </p>
 
-      {/* 正文 */}
+      {/* 正文：contain:layout 阻止子元素 position:fixed 逃出容器覆盖页面 */}
       {safeHtml ? (
-        <div
-          className="text-sm text-gray-700 leading-relaxed space-y-4"
-          style={{
-            lineHeight: '1.75',
-          }}
-          dangerouslySetInnerHTML={{ __html: safeHtml }}
-        />
+        <div style={{ contain: 'layout', position: 'relative' }}>
+          <div
+            className="text-sm text-gray-700 leading-relaxed space-y-4"
+            style={{ lineHeight: '1.75' }}
+            dangerouslySetInnerHTML={{ __html: safeHtml }}
+          />
+        </div>
       ) : (
         <p className="text-sm text-gray-400">
           暂无正文内容，请{' '}
