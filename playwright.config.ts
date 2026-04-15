@@ -19,8 +19,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      // Go 后端：在 backend 目录运行
-      command: 'cd ../backend && go run .',
+      // Go 后端：优先使用预编译二进制，回退到 go run
+      command: 'test -f ../backend/rss-backend && cd ../backend && ./rss-backend || (cd ../backend && go run .)',
       url: 'http://localhost:8080/api/feeds',
       reuseExistingServer: false,
       timeout: 60_000,

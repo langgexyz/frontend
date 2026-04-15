@@ -1,6 +1,11 @@
 // frontend/e2e/global-teardown.ts
 import { execSync } from 'child_process'
 import * as http from 'http'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default async function globalTeardown() {
   // 停止 RSS fixture server
@@ -17,11 +22,16 @@ export default async function globalTeardown() {
     }
   }
 
-  // 停止 MySQL
-  console.log('[teardown] Stopping MySQL...')
-  execSync(
-    'docker compose -f ../docker-compose.e2e.yml down',
-    { cwd: __dirname, stdio: 'inherit' }
-  )
-  console.log('[teardown] MySQL stopped')
+  // 停止 MySQL（仅当我们通过 Docker 启动时）
+  const mysqlDocker: boolean = (global as any).__MYSQL_DOCKER__
+  if (mysqlDocker) {
+    console.log('[teardown] Stopping MySQL docker container...')
+    execSync(
+      'docker compose -f ../docker-compose.e2e.yml down',
+      { cwd: __dirname, stdio: 'inherit' }
+    )
+    console.log('[teardown] MySQL stopped')
+  } else {
+    console.log('[teardown] MySQL was pre-existing, skipping docker compose down')
+  }
 }
